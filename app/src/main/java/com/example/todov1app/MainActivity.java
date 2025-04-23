@@ -10,15 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.todov1app.databinding.ActivityMainBinding;
@@ -120,12 +117,36 @@ public class MainActivity extends AppCompatActivity {
             if(item.getItemId() == R.id.showItem) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 Task tTask = tasks.get(currentPosition);
-                String tMsg = "Name: " + tTask.getName() + "\n" + "Description: " + tTask.getDescription();
+                String tMsg = "Name: " + tTask.getName() + "\n" + "Description: " + tTask.getDescription() + "\n" + "Priority: " + tTask.getPriority();
                 builder.setTitle("Task details");
                 builder.setMessage(tMsg);
                 builder.setPositiveButton("OK", null);
                 builder.create().show();
                 mode.finish();    //encerra o action mode
+                return true;
+            } else if (item.getItemId() == R.id.prioritizeItem) {
+                Task tTask = tasks.get(currentPosition);
+                String currentPriority = tTask.getPriority();
+                String newPriority;
+
+                switch (currentPriority) {
+                    case "low":
+                        newPriority = "medium";
+                        break;
+                    case "medium":
+                        newPriority = "high";
+                        break;
+                    case "high":
+                        Toast.makeText(MainActivity.this, "Task is already at high priority.", Toast.LENGTH_SHORT).show();
+                        mode.finish();
+                        return true;
+                    default:
+                        newPriority = "low"; // fallback
+                }
+
+                tTask.setPriority(newPriority);
+                taskRecyclerViewAdapter.notifyDataSetChanged();
+                mode.finish();
                 return true;
             } else if (item.getItemId() == R.id.deleteItem) {
                 tasks.remove(currentPosition);
